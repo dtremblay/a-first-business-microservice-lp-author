@@ -1,0 +1,13 @@
+GET http://0.0.0.0:8001/
+
+###
+POST http://0.0.0.0:8001/find_rate
+Content-Type: plain/text
+
+78701
+
+###
+POST http://0.0.0.0:8001/find_rate
+Content-Type: plain/text
+
+11011
