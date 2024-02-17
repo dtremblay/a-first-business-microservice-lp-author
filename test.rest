@@ -11,3 +11,9 @@ POST http://0.0.0.0:8001/find_rate
 Content-Type: plain/text
 
 11011
+
+###
+POST http://0.0.0.0:8001/find_rate
+Content-Type: plain/text
+
+89102

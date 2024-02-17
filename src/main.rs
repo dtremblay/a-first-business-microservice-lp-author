@@ -11,12 +11,12 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, anyhow::Er
     match (req.method(), req.uri().path()) {
         // Serve some instructions at /
         (&Method::GET, "/") => Ok(Response::new(Body::from(
-            "Try POSTing data to /find_rate such as: `curl localhost:8001/get_rate -XPOST -d '78701'`",
+            "Try POSTing data to /find_rate such as: `curl localhost:8001/find_rate -XPOST -d '78701'`",
         ))),
 
         (&Method::POST, "/find_rate") => {
             let post_body = hyper::body::to_bytes(req.into_body()).await?;
-            let mut rate = "0.08".to_string(); // default is 8%
+            let mut rate = "0".to_string(); // default is 8%
 
             let rates_data: &[u8] = include_bytes!("rates_by_zipcode.csv");
             let mut rdr = Reader::from_reader(rates_data);
@@ -28,8 +28,15 @@ async fn handle_request(req: Request<Body>) -> Result<Response<Body>, anyhow::Er
                     break;
                 }
             }
-
-            Ok(Response::new(Body::from(rate)))
+            if rate == "0" {
+                let mut error_message : String = String::from("Tax rate not found for zip: ");
+                error_message.push_str(str::from_utf8(&post_body).unwrap());
+                let mut not_found = Response::new(Body::from(error_message));
+                *not_found.status_mut() = StatusCode::NOT_FOUND;
+                Ok(not_found)
+            }else {
+                Ok(Response::new(Body::from(rate)))
+            }
         }
 
         // Return the 404 Not Found for other routes.
