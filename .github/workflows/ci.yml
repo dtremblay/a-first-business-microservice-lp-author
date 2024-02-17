@@ -14,8 +14,7 @@ on:
 
 jobs:
   build:
-
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
@@ -51,9 +50,17 @@ jobs:
           echo -e "Execution Fail!"
           exit 1
         fi
+        resp=$(curl http://localhost:8001/find_rate -X POST -d "89102")
+        echo "$resp"
+        if [[ $resp == "0.08375" ]]; then
+          echo -e "Execution Success!"
+        else
+          echo -e "Execution Fail!"
+          exit 1
+        fi
         resp=$(curl http://localhost:8001/find_rate -X POST -d "12345")
         echo "$resp"
-        if [[ $resp == "0.08" ]]; then
+        if [[ $resp == "Tax rate not found for zip: 12345" ]]; then
           echo -e "Execution Success!"
         else
           echo -e "Execution Fail!"
